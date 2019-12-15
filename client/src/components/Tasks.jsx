@@ -4,11 +4,8 @@ import { SortableContainer } from 'react-sortable-hoc';
 import { Context } from '../context';
 import Task from './Task';
 
-const renderTasks = (tasks, exclude = []) => {
+const renderTasks = tasks => {
   return tasks.map((task, index) => {
-    if (exclude.includes(task.id)) {
-      return null;
-    }
     return <Task key={task.id} task={task} index={index} />;
   });
 };
@@ -18,7 +15,11 @@ const Tasks = ({ tasks }) => {
     state: { hiddenTasks }
   } = useContext(Context);
 
-  return <div>{renderTasks(tasks, hiddenTasks)}</div>;
+  const tasksMod = tasks.filter(task => {
+    return !hiddenTasks.includes(task.id);
+  });
+
+  return <div>{renderTasks(tasksMod)}</div>;
 };
 
 export default SortableContainer(Tasks);

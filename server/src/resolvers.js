@@ -157,8 +157,6 @@ const resolvers = {
         id: afterParentId
       });
 
-      console.log(afterParentId, afterParentIndex);
-
       // Add task as child of 'after' parent
       let parentChildren = taskLists[taskList].tasks[
         afterParentIndex
@@ -209,7 +207,11 @@ const resolvers = {
         const descendants = getAllDescendants(taskLists[taskList].tasks, task);
         descendants.forEach((childId, index) => {
           const child = _.find(taskLists[taskList].tasks, { id: childId });
-          child.depth = child.depth + depthDiff;
+          let childDepth = child.depth + depthDiff;
+          if (childDepth < 0) {
+            childDepth = 0;
+          }
+          child.depth = childDepth;
         });
       }
 
@@ -237,8 +239,11 @@ const resolvers = {
       //Update task with new parent and depth based on 'under'
       const taskIndex = _.findIndex(taskLists[taskList].tasks, { id: task });
 
-      const newDepth =
-        _.find(taskLists[taskList].tasks, { id: under }).depth + 1;
+      let newDepth = _.find(taskLists[taskList].tasks, { id: under }).depth + 1;
+
+      if (newDepth < 0) {
+        newDepth = 0;
+      }
 
       taskLists[taskList].tasks[taskIndex] = {
         ...taskLists[taskList].tasks[taskIndex],

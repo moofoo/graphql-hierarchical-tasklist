@@ -10,7 +10,6 @@ const TasksContainer = () => {
 
   const {
     state: { selectedId },
-    setDraggedTask,
     setHiddenTasks
   } = useContext(Context);
 
@@ -30,13 +29,9 @@ const TasksContainer = () => {
     }
 
     const draggedTask = tasks[oldIndex];
-    let droppedTask = tasks[newIndex].left;
+    const droppedTask = tasks[newIndex].left;
     const draggedId = draggedTask.id;
-    let droppedId = droppedTask && droppedTask.id;
-
-    if (droppedTask.parent === draggedId) {
-      return;
-    }
+    const droppedId = droppedTask && droppedTask.id;
 
     if (!droppedTask) {
       moveAfter({

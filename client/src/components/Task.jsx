@@ -82,7 +82,7 @@ const Task = ({ task }) => {
           variables: {
             taskList: selectedId,
             task: task.id,
-            after: task.leftParent.id
+            after: (task.leftParent && task.leftParent.id) || task.left.id
           }
         });
       } else {
@@ -116,7 +116,6 @@ const Task = ({ task }) => {
         />
       </InputGroup.Prepend>
       <FormControl
-        placeholder={task.id}
         value={task.text}
         onKeyDown={keyDownHandler}
         onChange={e =>
