@@ -3,5 +3,5 @@
 Using:
 
 - GraphQL and Apollo on server/client
-- Bootrap
+- Bootstrap
 - React Sortable HOC
