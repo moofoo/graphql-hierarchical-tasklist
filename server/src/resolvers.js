@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const shortid = require('shortid');
-const { getAllDescendants } = require('../lib');
+const { getAllDescendants } = require('./lib');
 
 const initListId = shortid.generate();
 const initRootId = shortid.generate();
