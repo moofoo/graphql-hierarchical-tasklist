@@ -153,8 +153,6 @@ const resolvers = {
           : taskLists[taskList].tasks[0].id;
       }
 
-      const toTop = afterParentId === taskLists[taskList].tasks[0].id;
-
       const afterParentIndex = _.findIndex(taskLists[taskList].tasks, {
         id: afterParentId
       });
@@ -235,11 +233,6 @@ const resolvers = {
       //Add task as a child of 'under' unless last is specified
       const underIndex = _.findIndex(taskLists[taskList].tasks, { id: under });
       taskLists[taskList].tasks[underIndex].children.push(task);
-      // if (last === true) {
-
-      // } else {
-      //   taskLists[taskList].tasks[underIndex].children.unshift(task);
-      // }
 
       //Update task with new parent and depth based on 'under'
       const taskIndex = _.findIndex(taskLists[taskList].tasks, { id: task });
