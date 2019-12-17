@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useMutation } from 'react-apollo';
 import { useTasks } from '../hooks';
-import { MOVE_AFTER } from '../graphql/mutations';
+import { MOVE_AFTER, MOVE_BEFORE } from '../graphql/mutations';
 import Tasks from './Tasks';
 import { Context } from '../context';
 
@@ -17,6 +17,10 @@ const TasksContainer = () => {
     refetchQueries: ['Tasks']
   });
 
+  const [moveBefore] = useMutation(MOVE_BEFORE, {
+    refetchQueries: ['Tasks']
+  });
+
   const updateBeforeSortStart = ({ index }) => {
     setHiddenTasks(tasks[index].descendants);
   };
@@ -28,25 +32,20 @@ const TasksContainer = () => {
       return;
     }
 
-    const draggedTask = tasks[oldIndex];
-    const droppedTask = tasks[newIndex].left;
-    const draggedId = draggedTask.id;
-    const droppedId = droppedTask && droppedTask.id;
-
-    if (!droppedTask) {
+    if (newIndex > oldIndex) {
       moveAfter({
         variables: {
           taskList: selectedId,
-          task: draggedId,
-          after: 'root'
+          task: tasks[oldIndex].id,
+          after: tasks[newIndex].id
         }
       });
     } else {
-      moveAfter({
+      moveBefore({
         variables: {
           taskList: selectedId,
-          task: draggedId,
-          after: droppedId
+          task: tasks[oldIndex].id,
+          before: tasks[newIndex].id
         }
       });
     }

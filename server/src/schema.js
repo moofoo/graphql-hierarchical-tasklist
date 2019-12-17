@@ -30,7 +30,9 @@ const typeDefs = gql`
     removeTask(taskList: ID!, task: ID!): Task
     updateTask(taskList: ID!, task: ID!, text: String): Task
     moveAfter(taskList: ID!, task: ID!, after: ID): Task
-    moveUnder(taskList: ID!, task: ID!, under: ID!): Task
+    moveBefore(taskList: ID!, task: ID!, before: ID): Task
+    indent(taskList: ID!, task: ID!, under: ID!): Task
+    unindent(taskList: ID!, task: ID!, under: ID!): Task
     setComplete(taskList: ID!, task: ID, complete: Boolean!): Task
     clearCompleted(taskList: ID!): TaskList
   }

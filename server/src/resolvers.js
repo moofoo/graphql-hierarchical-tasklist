@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const shortid = require('shortid');
 const { getAllDescendants } = require('./lib');
+const { moveAfter, moveBefore, indent, unindent } = require('./hieararchical');
 
 const initListId = shortid.generate();
 const initRootId = shortid.generate();
@@ -144,122 +145,21 @@ const resolvers = {
       return taskLists[taskList].tasks[taskIndex];
     },
     moveAfter(root, { taskList, task, after }) {
-      let afterParentId;
-      if (after === 'root') {
-        afterParentId = taskLists[taskList].tasks[0].id;
-      } else {
-        afterParentId = after
-          ? _.find(taskLists[taskList].tasks, { id: after }).parent
-          : taskLists[taskList].tasks[0].id;
-      }
-
-      const afterParentIndex = _.findIndex(taskLists[taskList].tasks, {
-        id: afterParentId
-      });
-
-      // Add task as child of 'after' parent
-      let parentChildren = taskLists[taskList].tasks[
-        afterParentIndex
-      ].children.filter(childId => childId !== task);
-
-      const afterChildIndex = _.findIndex(
-        taskLists[taskList].tasks[afterParentIndex].children,
-        id => id === after
-      );
-
-      //  if (toTop) {
-      //    parentChildren.unshift(task);
-      //  } else {
-      parentChildren.splice(afterChildIndex + 1, 0, task);
-      //   }
-
-      taskLists[taskList].tasks[afterParentIndex].children = _.uniq(
-        parentChildren
-      );
-      const taskIndex = _.findIndex(taskLists[taskList].tasks, { id: task });
-
-      if (after !== 'root') {
-        //Remove task, if it exists, from 'after' task children, to handle
-        //case when nested task is un-nested
-        const afterIndex = _.findIndex(taskLists[taskList].tasks, {
-          id: after
-        });
-
-        taskLists[taskList].tasks[afterIndex].children = _.uniq(
-          taskLists[taskList].tasks[afterIndex].children.filter(
-            childId => childId !== task
-          )
-        );
-
-        //Update task with new parent and depth based on 'after'
-
-        const oldDepth = taskLists[taskList].tasks[taskIndex].depth;
-        const newDepth = _.find(taskLists[taskList].tasks, { id: after }).depth;
-        const depthDiff = newDepth - oldDepth;
-
-        taskLists[taskList].tasks[taskIndex] = {
-          ...taskLists[taskList].tasks[taskIndex],
-          depth: newDepth,
-          parent: afterParentId
-        };
-
-        //Update descendants of task with new depth
-        const descendants = getAllDescendants(taskLists[taskList].tasks, task);
-        descendants.forEach((childId, index) => {
-          const child = _.find(taskLists[taskList].tasks, { id: childId });
-          let childDepth = child.depth + depthDiff;
-          if (childDepth < 0) {
-            childDepth = 0;
-          }
-          child.depth = childDepth;
-        });
-      }
-
-      return taskLists[taskList].tasks[taskIndex];
+      moveAfter(taskLists[taskList].tasks, task, after);
     },
-    moveUnder(root, { taskList, task, under }) {
-      const taskParentId = _.find(taskLists[taskList].tasks, { id: task })
-        .parent;
 
-      const taskParentIndex = _.findIndex(taskLists[taskList].tasks, {
-        id: taskParentId
-      });
-
-      // Remove task from current parent's children
-      let filteredChildren = taskLists[taskList].tasks[
-        taskParentIndex
-      ].children.filter(childId => childId !== task);
-
-      taskLists[taskList].tasks[taskParentIndex].children = filteredChildren;
-
-      //Add task as a child of 'under' unless last is specified
-      const underIndex = _.findIndex(taskLists[taskList].tasks, { id: under });
-      taskLists[taskList].tasks[underIndex].children.push(task);
-
-      //Update task with new parent and depth based on 'under'
-      const taskIndex = _.findIndex(taskLists[taskList].tasks, { id: task });
-
-      let newDepth = _.find(taskLists[taskList].tasks, { id: under }).depth + 1;
-
-      if (newDepth < 0) {
-        newDepth = 0;
-      }
-
-      taskLists[taskList].tasks[taskIndex] = {
-        ...taskLists[taskList].tasks[taskIndex],
-        depth: newDepth,
-        parent: under
-      };
-
-      //Update descendants of task with new depth
-      const descendants = getAllDescendants(taskLists[taskList].tasks, task);
-      descendants.forEach((childId, index) => {
-        const child = _.find(taskLists[taskList].tasks, { id: childId });
-        child.depth = child.depth + 1;
-      });
-
-      return taskLists[taskList].tasks[taskIndex];
+    moveBefore(root, { taskList, task, before }) {
+      moveBefore(taskLists[taskList].tasks, task, before);
     },
+
+    indent(root, { taskList, task, under }) {
+      indent(taskLists[taskList].tasks, task, under);
+    },
+
+    unindent(root, { taskList, task, under }) {
+      unindent(taskLists[taskList].tasks, task, under);
+    },
+
     setComplete(root, { taskList, task, complete }) {
       const theTask = _.find(taskLists[taskList].tasks, { id: task });
 

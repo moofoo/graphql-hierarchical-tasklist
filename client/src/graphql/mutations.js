@@ -55,9 +55,22 @@ export const REMOVE_TASK = gql`
   }
 `;
 
-export const MOVE_UNDER = gql`
-  mutation MoveUnder($taskList: ID!, $task: ID!, $under: ID!) {
-    moveUnder(taskList: $taskList, task: $task, under: $under) {
+export const INDENT = gql`
+  mutation Indent($taskList: ID!, $task: ID!, $under: ID!) {
+    indent(taskList: $taskList, task: $task, under: $under) {
+      id
+      parent
+      children
+      root
+      text
+      complete
+    }
+  }
+`;
+
+export const UNINDENT = gql`
+  mutation Unindent($taskList: ID!, $task: ID!, $under: ID!) {
+    unindent(taskList: $taskList, task: $task, under: $under) {
       id
       parent
       children
@@ -69,8 +82,21 @@ export const MOVE_UNDER = gql`
 `;
 
 export const MOVE_AFTER = gql`
-  mutation MoveAfter($taskList: ID!, $task: ID!, $after: ID!) {
+  mutation MoveAfter($taskList: ID!, $task: ID!, $after: ID) {
     moveAfter(taskList: $taskList, task: $task, after: $after) {
+      id
+      parent
+      children
+      root
+      text
+      complete
+    }
+  }
+`;
+
+export const MOVE_BEFORE = gql`
+  mutation MoveBefore($taskList: ID!, $task: ID!, $before: ID) {
+    moveBefore(taskList: $taskList, task: $task, before: $before) {
       id
       parent
       children

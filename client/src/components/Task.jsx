@@ -6,10 +6,10 @@ import { MdDragHandle } from 'react-icons/md';
 import { FaTrash } from 'react-icons/fa';
 import {
   UPDATE_TASK,
-  MOVE_AFTER,
-  MOVE_UNDER,
   SET_COMPLETE,
-  REMOVE_TASK
+  REMOVE_TASK,
+  INDENT,
+  UNINDENT
 } from '../graphql/mutations';
 import { Context } from '../context';
 
@@ -24,11 +24,11 @@ const Task = ({ task }) => {
 
   const [updateTask] = useMutation(UPDATE_TASK);
 
-  const [moveUnder] = useMutation(MOVE_UNDER, {
+  const [indent] = useMutation(INDENT, {
     refetchQueries: ['Tasks']
   });
 
-  const [moveAfter] = useMutation(MOVE_AFTER, {
+  const [unindent] = useMutation(UNINDENT, {
     refetchQueries: ['Tasks']
   });
 
@@ -47,27 +47,19 @@ const Task = ({ task }) => {
 
     if (event.key === 'Tab' && !event.shiftKey && task.left) {
       if (task.leftByDepth && task.depth <= task.left.depth) {
-        moveUnder({
+        indent({
           variables: {
             taskList: selectedId,
             task: task.id,
             under: task.leftByDepth.id
           }
         });
-      } else if (task.depth === task.left.depth) {
-        moveUnder({
+      } else if (task.depth <= task.left.depth) {
+        indent({
           variables: {
             taskList: selectedId,
             task: task.id,
             under: task.left.id
-          }
-        });
-      } else if (task.depth < task.left.depth) {
-        moveAfter({
-          variables: {
-            taskList: selectedId,
-            task: task.id,
-            after: task.left.id
           }
         });
       }
@@ -78,19 +70,19 @@ const Task = ({ task }) => {
       task.depth > 0
     ) {
       if (task.depth <= task.left.depth) {
-        moveAfter({
+        unindent({
           variables: {
             taskList: selectedId,
             task: task.id,
-            after: (task.leftParent && task.leftParent.id) || task.left.id
+            under: (task.leftParent && task.leftParent.id) || task.left.id
           }
         });
       } else {
-        moveAfter({
+        unindent({
           variables: {
             taskList: selectedId,
             task: task.id,
-            after: task.left.id
+            under: task.left.id
           }
         });
       }
